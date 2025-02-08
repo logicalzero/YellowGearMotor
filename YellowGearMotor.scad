@@ -13,6 +13,25 @@ module MotorShaft(h=18.5) {
         }
 }
 
+
+/**
+ * A cylinder, intended to be differenced from another object to fit the motor
+ * shaft with enough room to turn. This is  generated with the same origin and
+ * orientation as `YellowGearMotor`.
+ * 
+ * @param h: Hole depth (length) from the center of the gear motor.
+ * @param r: Hole radius.
+ * @param doubleSided: If `true` (and `shaft` is `true`), the shaft will protrude
+ *     from both sides of the motor. This reflects the two models of gear motor.
+ */
+module ShaftHole(h=20, r=2.75, doubleSided=false) {
+    if(doubleSided)
+        cylinder(h*2, r, r, center=true);
+    else
+        cylinder(h, r, r);
+}
+
+
 /**
  * MountingHoles: cylinders representing the gear motor's mounting holes, for
  * subtracting matching holes in another model for attachment. These are 
@@ -31,17 +50,18 @@ module MountingHoles(h=20, r=1.25) {
  * A complete model of a common, cheap DC gear motor, typically in a yellow plastic
  * housing. 
  * 
- * @param shaft: If `true` (default), generate the motor's keyed output shaft.
- * @param doubleSided: If `true` (and `shaft` is `true`), the shaft will protrude
- *     both sides of the motor. This reflects the two models of gear motor.
- * @param holes: If `true` (default), the gear motor's mounting holes will be
- *     generated in the model. Not recommended if differencing `YellowGearMotor`
- *     from another object.
  * @param pad: An amount of padding (in local units) to enlarge the gear motor
  *     model, intended for creating a slightly oversized cavity in another object
  *     for inserting a real gear motor into a printed object.
+ * @param shaft: If `true`, generate the motor's keyed output shaft. Not recommended
+ *     if differencing `YellowGearMotor` from another object.
+ * @param doubleSided: If `true` (and `shaft` is `true`), the shaft will protrude
+ *     from both sides of the motor. This reflects the two models of gear motor.
+ * @param holes: If `true` (default), the gear motor's mounting holes will be
+ *     generated in the model. Not recommended if differencing `YellowGearMotor`
+ *     from another object.
  */
-module YellowGearMotor(shaft=true, doubleSided=false, holes=false, pad=0) {
+module YellowGearMotor(pad=0, shaft=true, doubleSided=false, holes=false) {
     // Main body
     color("yellow") {
         difference() {
@@ -73,16 +93,20 @@ module YellowGearMotor(shaft=true, doubleSided=false, holes=false, pad=0) {
                 
                 // Strap hooks
                 translate([0, -30, -.5]) cube([5.25+pad, 3+pad, 22+pad], center=true);
+                
+                // Strap
                 translate([0, -30, -.5]) cube([12+pad, 10+pad, 19+pad], center=true);
-//                translate([0, -40, -.5]) cube([10+pad,28+pad,19+pad], center=true);
                 hull() {
-                    translate([0, -40, -.5]) cube([10+pad,20+pad,19+pad], center=true);
-translate([0,-52.25,-8.25]) rotate([0,90,0])
-cylinder(10+pad,1.75+pad/2,1.75+pad/2, center=true);
-
-translate([0,-52.25,7.25]) rotate([0,90,0])
-cylinder(10+pad,1.75+pad/2,1.75+pad/2, center=true);
+                    translate([0, -40, -.5]) 
+                        cube([10+pad, 20+pad, 19+pad], center=true);
+                    translate([0, -52.25, -8.25]) 
+                        rotate([0, 90, 0])
+                            cylinder(10+pad, 1.75+pad/2, 1.75+pad/2, center=true);
+                    translate([0, -52.25, 7.25]) 
+                        rotate([0, 90, 0])
+                            cylinder(10+pad, 1.75+pad/2, 1.75+pad/2, center=true);
                 }
+                
                 // Key nub
                 translate([0,-10,0])
                     cylinder(10.5+pad,2+pad,2+pad, $fn=15);
@@ -103,6 +127,8 @@ cylinder(10+pad,1.75+pad/2,1.75+pad/2, center=true);
         }
     }
 }
+
+// Example (remove later)
 $fa=1;
-YellowGearMotor(shaft=false, holes=true, pad=1);
+YellowGearMotor(shaft=false, holes=true, pad=0);
 translate([0,0,9.25]) MotorShaft();
